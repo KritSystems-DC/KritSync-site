@@ -1,0 +1,58 @@
+Krit-Faslo Dependency Verification
+==================================
+
+Tool used:
+- dumpbin.exe /DEPENDENTS
+- Path: C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\bin\Hostx64\x64\dumpbin.exe
+
+Main plugin inspected:
+- 01_release/Krit-Faslo/Krit-Faslo.dll
+
+Direct dependencies reported by Krit-Faslo.dll:
+- AsaApi.dll
+- bcrypt.dll
+- KERNEL32.dll
+- MSVCP140.dll
+- VCRUNTIME140_1.dll
+- VCRUNTIME140.dll
+- api-ms-win-crt-math-l1-1-0.dll
+- api-ms-win-crt-stdio-l1-1-0.dll
+- api-ms-win-crt-heap-l1-1-0.dll
+- api-ms-win-crt-string-l1-1-0.dll
+- api-ms-win-crt-time-l1-1-0.dll
+- api-ms-win-crt-runtime-l1-1-0.dll
+- api-ms-win-crt-convert-l1-1-0.dll
+- api-ms-win-crt-filesystem-l1-1-0.dll
+- api-ms-win-crt-locale-l1-1-0.dll
+
+Result:
+- Krit-Faslo.dll does not directly import the bundled Poco, OpenSSL, minizip, or zlib DLLs.
+- AsaApi.dll is expected to come from the ArkServerAPI / ASA Server API installation.
+- bcrypt.dll is a Windows system DLL used for RSA/SHA-256 license verification.
+- MSVCP140.dll, VCRUNTIME140_1.dll, VCRUNTIME140.dll, and api-ms-win-crt-* are Visual C++ runtime / Windows runtime components.
+- Krit-Faslo.dll is x64 / PE32+.
+- Krit-Faslo.dll has no delay import directory.
+- Krit-Faslo.dll import-table scan did not show LoadLibrary, GetProcAddress,
+  Poco, OpenSSL, minizip, or zlib references.
+
+Bundled DLL relationship notes:
+- libssl-3-x64.dll imports libcrypto-3-x64.dll.
+- minizip.dll imports z.dll.
+- PocoCrypto.dll imports PocoFoundation.dll and libcrypto-3-x64.dll.
+- PocoNet.dll imports PocoFoundation.dll.
+- PocoNetSSL.dll imports PocoCrypto.dll, PocoUtil.dll, PocoNet.dll, libssl-3-x64.dll, libcrypto-3-x64.dll, and PocoFoundation.dll.
+- PocoUtil.dll imports PocoXML.dll, PocoJSON.dll, and PocoFoundation.dll.
+- PocoFoundation.dll imports pcre2-8.dll, z.dll, and utf8proc.dll.
+
+Warning:
+- dumpbin verifies static import-table dependencies only.
+- It does not prove that a DLL is never loaded dynamically by code paths that do
+  not expose normal import-table entries.
+- Final verification requires testing plugin load on a spare/local server and checking ArkApi logs.
+
+Current conclusion:
+- Verified direct dependencies for Krit-Faslo.dll are AsaApi.dll, bcrypt.dll, and standard Microsoft runtime/system DLLs.
+- Bundled Poco/OpenSSL/minizip/z DLLs are not direct dependencies of Krit-Faslo.dll.
+- Static evidence strongly suggests the bundled Poco/OpenSSL/minizip/z DLLs are
+  not required for plugin load.
+- Runtime testing is still required before deleting them from all archives.

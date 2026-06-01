@@ -1,0 +1,56 @@
+// Krit-Faslo commented configuration.
+//
+// This file is for documentation only. The plugin runtime config is config.json.
+// Do not replace config.json with this file unless the plugin explicitly supports JSONC.
+{
+  // Enables or disables the plugin behavior.
+  "Enabled": true,
+
+  // License key for this Krit-Faslo installation. Replace the empty string
+  // with the key provided for the server before running the plugin.
+  "LicenseKey": "",
+
+  // Fallback harvest multiplier used when ReadHarvestAmountMultiplierFromIni is false
+  // or when the value cannot be read from GameUserSettings.ini.
+  "HarvestMultiplier": 10.0,
+
+  // When true, read the server harvest amount multiplier from GameUserSettings.ini.
+  "ReadHarvestAmountMultiplierFromIni": true,
+
+  // Optional path to GameUserSettings.ini. Leave empty to use the plugin default lookup.
+  "GameUserSettingsPath": "",
+
+  // Baseline official flint amount used for scaling checks.
+  "BaselineOfficialFlint": 80,
+
+  // Minimum randomized target flint amount. When both target values are valid,
+  // the plugin chooses a target amount between TargetFlintMin and TargetFlintMax.
+  "TargetFlintMin": 350,
+
+  // Maximum randomized target flint amount.
+  "TargetFlintMax": 550,
+
+  // Minimum flint amount that can trigger the plugin behavior.
+  "MinTriggerAmount": 1,
+
+  // Maximum flint amount that can trigger the plugin behavior.
+  "MaxTriggerAmount": 120,
+
+  // Allowed percentage variance around the expected flint amount.
+  "VariancePercent": 10,
+
+  // Shows a HUD notification when extra flint behavior is applied.
+  "ShowHudNotificationForExtraFlint": false,
+
+  // Enables additional diagnostic log output for troubleshooting.
+  "DebugLogging": false,
+
+  // Character blueprint classes treated as Fasola targets by the plugin.
+  "FasolaClasses": [
+    "Fasola_Character_BP_C",
+    "Fasola_Character_BP_Aberrant_C"
+  ],
+
+  // Resource class name for flint.
+  "FlintClass": "PrimalItemResource_Flint_C"
+}

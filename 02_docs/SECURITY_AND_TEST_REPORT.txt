@@ -1,0 +1,106 @@
+Krit-Faslo Security and Test Report
+===================================
+
+Scope:
+- Checked the local release package only.
+- The DLL was rebuilt from the FasolaFlintScaler source project to add LicenseKey enforcement.
+- No DLLs were patched, decompiled, or reverse engineered.
+- No live server files were touched.
+
+Package checked:
+- 01_release/Krit-Faslo/
+
+Package validation:
+- PASS: Plugin folder exists.
+- PASS: Main DLL exists: Krit-Faslo.dll.
+- PASS: Config exists: config.json.
+- PASS: Folder name and main DLL name match: Krit-Faslo / Krit-Faslo.dll.
+- PASS: config.json parses as valid JSON.
+
+Static dependency check:
+- PASS: dumpbin /DEPENDENTS successfully read Krit-Faslo.dll.
+- PASS: dumpbin /HEADERS successfully read Krit-Faslo.dll.
+- PASS: Krit-Faslo.dll is x64 / PE32+.
+- PASS: Krit-Faslo.dll has no delay import directory.
+- PASS: Import-table scan did not show LoadLibrary or GetProcAddress.
+- PASS: Import-table scan did not show Poco/OpenSSL/minizip/zlib references.
+- Krit-Faslo.dll directly imports:
+  - AsaApi.dll
+  - bcrypt.dll
+  - KERNEL32.dll
+  - MSVCP140.dll
+  - VCRUNTIME140_1.dll
+  - VCRUNTIME140.dll
+  - api-ms-win-crt-* runtime DLLs
+- The bundled Poco/OpenSSL/minizip/z DLLs are not static imports of Krit-Faslo.dll.
+- bcrypt.dll is a Windows system DLL used for RSA/SHA-256 license verification.
+
+Authenticode signature check:
+- WARNING: Release DLLs are not digitally signed.
+- This is common for many private/community plugin DLLs, but it means Windows
+  cannot verify publisher identity from a code-signing certificate.
+
+Alternate data stream check:
+- PASS: No Zone.Identifier or other extra alternate data streams were found on
+  release files.
+
+Microsoft Defender check:
+- PASS: A Defender custom scan was requested for:
+  C:\Users\bigma\OneDrive\Desktop\Krit-Faslo\01_release\Krit-Faslo
+- PASS: Get-MpThreatDetection returned no detections after the scan.
+
+SHA256 hashes:
+- Krit-Faslo.dll:
+  D18DD703A32B1864A851D593F9C1396427E5C2622CFB876AAAC978CE74D703E9
+- libcrypto-3-x64.dll:
+  A7672EBFF56D625996D784FE594302E3833272BCF0E5BD911562019351AC822E
+- libssl-3-x64.dll:
+  650D218B75963B19E5922BFEA19CE223EB362C4D294658AAC82A1259CFF26147
+- minizip.dll:
+  871F12658BBB535B52D588565B10C2EF799677252644E4F1F3D14F32CA6FA902
+- PocoCrypto.dll:
+  06ADBCA9D474FA79F43D5013236B02116CA6F03AB10E00CCC9C9DC8385A88FD5
+- PocoFoundation.dll:
+  A21FCE224FC72CA70E5B55AE18C1F807CA798F2DC48F45E85244A53FCE4019BE
+- PocoNet.dll:
+  C28BFE2FC333144BC703AC80FFCEDFA06221699787274D6613E3717982B5022C
+- PocoNetSSL.dll:
+  CC847A3E6E43399E37537ED352484E26B6E4FBA708031055D60E8EBC418BAD72
+- PocoUtil.dll:
+  5EE926357B0EB7901648A3FBEC14FD31026ED5C0BB44A6FA012CA88627FC81CB
+- z.dll:
+  C7D03C2883D594F79FE53A011AB12260695820B6DD9645C2C2A0FFB126473799
+
+Backend/runtime tests:
+- PASS: FasolaFlintScaler source project rebuilt successfully with MSBuild Release|x64.
+- PASS: License admin tool issued and verified a KFASLO-v1 license key.
+- NOT RUN: No local ASA test server is available in this workspace.
+- Runtime verification still requires installing 01_release/Krit-Faslo on a
+  spare/local ASA server and checking ArkApi logs.
+
+Recommended runtime test:
+1. Copy 01_release/Krit-Faslo into:
+   ShooterGame/Binaries/Win64/ArkApi/Plugins/
+2. Restart the test server.
+3. Check ArkApi logs for:
+   - plugin loaded successfully
+   - missing DLL errors
+   - config parse errors
+   - license accepted or license rejected messages
+   - runtime exceptions
+
+Current conclusion:
+- The local release package passes basic structure/config/static checks.
+- No Defender detections were reported.
+- Static checks strongly indicate that the bundled Poco/OpenSSL/minizip/z DLLs
+  are not required by Krit-Faslo.dll.
+- The main residual risks are unsigned DLLs and untested runtime behavior on an
+  actual ASA/ArkServerAPI server.
+
+Minimal runtime test package created:
+- 03_test_packages/minimal_static_imports_only/Krit-Faslo/
+- Contains only:
+  - Krit-Faslo.dll
+  - config.json
+- Use this on a spare/local server to prove whether the plugin loads without
+  the candidate runtime libraries.

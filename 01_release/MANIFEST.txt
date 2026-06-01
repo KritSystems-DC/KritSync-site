@@ -1,0 +1,80 @@
+Krit-Faslo Minimal Release Manifest
+===================================
+
+Release folder:
+
+  01_release/Krit-Faslo/
+
+Included files:
+
+  Krit-Faslo/config.json
+    Purpose: plugin runtime configuration, including LicenseKey placeholder
+    Size: 513 bytes
+
+  Krit-Faslo/Krit-Faslo.dll
+    Purpose: main plugin DLL
+    Size: 302592 bytes
+    SHA256: D18DD703A32B1864A851D593F9C1396427E5C2622CFB876AAAC978CE74D703E9
+
+  Krit-Faslo/README.md
+    Purpose: install, runtime, and licensing notes
+
+  Krit-Faslo/CONFIG-COMMENTED.jsonc
+    Purpose: human-readable commented config example
+
+Admin-only licensing files outside this release:
+
+  ../03_license_admin/KritFaslo-LicenseTool.ps1
+    Purpose: create signing keys, issue licenses, and verify licenses
+
+  ../03_license_admin/krit-faslo-private-key.json
+    Purpose: private signing key created by the license tool
+    Warning: keep secret and do not ship to users or place on game servers
+
+  ../03_license_admin/krit-faslo-public-key.json
+    Purpose: public verification key for future DLL source integration
+
+  ../03_license_admin/README.md
+  ../03_license_admin/PLUGIN_INTEGRATION.md
+    Purpose: license operations and plugin integration documentation
+
+Excluded from this clean release:
+
+  AsaApi.dll
+    Reason: server API dependency, normally provided by ArkServerAPI /
+    ASA Server API.
+
+  libcrypto-3-x64.dll
+  libssl-3-x64.dll
+  minizip.dll
+  PocoCrypto.dll
+  PocoFoundation.dll
+  PocoNet.dll
+  PocoNetSSL.dll
+  PocoUtil.dll
+  z.dll
+    Reason: static dependency checks show Krit-Faslo.dll does not directly
+    import these DLLs. Runtime testing is still required to rule out dynamic
+    loading before discarding the older full package.
+
+Expected system/runtime imports:
+
+  AsaApi.dll
+    Provided by ArkServerAPI / ASA Server API.
+
+  bcrypt.dll
+    Windows system DLL used for RSA/SHA-256 license verification.
+
+  MSVC and Windows API runtime DLLs
+    Provided by the server OS / Visual C++ runtime installation.
+
+Verification basis:
+
+  See 02_docs/DEPENDENCY_VERIFICATION.txt and
+  02_docs/SECURITY_AND_TEST_REPORT.txt.
+
+Licensing note:
+
+  License keys can be generated with the admin tool. This release DLL was
+  rebuilt from the FasolaFlintScaler source project with RSA/SHA-256 license
+  verification and disables plugin behavior when LicenseKey is not accepted.
