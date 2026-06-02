@@ -1,5 +1,6 @@
 #include "FasolaFlintScaler/PluginModule.h"
 
+#include <chrono>
 #include <sstream>
 
 namespace FasolaFlintScaler {
@@ -176,6 +177,106 @@ void PluginModule::UnregisterCommands() {
     commands_registered_ = false;
 }
 
+void PluginModule::ResetAntiDupeState() {
+    recent_flint_adds_.clear();
+    last_anti_dupe_fingerprint_.clear();
+    last_anti_dupe_timestamp_ = {};
+    has_last_anti_dupe_event_ = false;
+}
+
+PluginModule::AntiDupeResult PluginModule::EvaluateAntiDupe(const FlintContext& context,
+                                                            const ScaleDecision& decision) {
+    if (!config_.AntiDupeEnabled) {
+        return {};
+    }
+
+    if (config_.BlockNegativeOrZeroAdjustments && decision.add_amount <= 0) {
+        return {false, "blocked zero or negative adjustment"};
+    }
+
+    if (config_.RequireFasolaOwnerMatch && !IsFasolaContext(context, config_)) {
+        return {false, "blocked non-Fasola owner or inventory"};
+    }
+
+    if (config_.MaxExtraFlintPerStack > 0 && decision.add_amount > config_.MaxExtraFlintPerStack) {
+        std::ostringstream reason;
+        reason << "blocked stack adjustment above MaxExtraFlintPerStack"
+               << " add_amount=" << decision.add_amount
+               << ", max=" << config_.MaxExtraFlintPerStack;
+        return {false, reason.str()};
+    }
+
+    const auto now = std::chrono::steady_clock::now();
+
+    if (config_.DuplicateDetectionWindowMs > 0) {
+        const auto fingerprint = AntiDupeFingerprint(context, decision);
+        const auto window = std::chrono::milliseconds(config_.DuplicateDetectionWindowMs);
+        if (has_last_anti_dupe_event_
+            && fingerprint == last_anti_dupe_fingerprint_
+            && now - last_anti_dupe_timestamp_ <= window) {
+            std::ostringstream reason;
+            reason << "blocked duplicate harvest event inside DuplicateDetectionWindowMs"
+                   << " window_ms=" << config_.DuplicateDetectionWindowMs;
+            return {false, reason.str()};
+        }
+    }
+
+    if (config_.MaxExtraFlintPerSecond > 0) {
+        const auto rate_window = std::chrono::seconds(1);
+        while (!recent_flint_adds_.empty() && now - recent_flint_adds_.front().timestamp > rate_window) {
+            recent_flint_adds_.pop_front();
+        }
+
+        int recent_total = 0;
+        for (const auto& add : recent_flint_adds_) {
+            recent_total += add.amount;
+        }
+
+        if (recent_total + decision.add_amount > config_.MaxExtraFlintPerSecond) {
+            std::ostringstream reason;
+            reason << "blocked extra flint rate above MaxExtraFlintPerSecond"
+                   << " recent_total=" << recent_total
+                   << ", add_amount=" << decision.add_amount
+                   << ", max=" << config_.MaxExtraFlintPerSecond;
+            return {false, reason.str()};
+        }
+    }
+
+    return {};
+}
+
+void PluginModule::RecordAntiDupeAccepted(const FlintContext& context, const ScaleDecision& decision) {
+    if (!config_.AntiDupeEnabled) {
+        return;
+    }
+
+    const auto now = std::chrono::steady_clock::now();
+    if (config_.MaxExtraFlintPerSecond > 0) {
+        recent_flint_adds_.push_back({now, decision.add_amount});
+    }
+
+    if (config_.DuplicateDetectionWindowMs > 0) {
+        last_anti_dupe_fingerprint_ = AntiDupeFingerprint(context, decision);
+        last_anti_dupe_timestamp_ = now;
+        has_last_anti_dupe_event_ = true;
+    }
+}
+
+std::string PluginModule::AntiDupeFingerprint(const FlintContext& context, const ScaleDecision& decision) const {
+    (void)decision;
+
+    std::ostringstream fingerprint;
+    fingerprint << context.native_item << '|'
+                << context.native_inventory << '|'
+                << context.amount << '|'
+                << context.item_blueprint << '|'
+                << context.item_archetype_blueprint << '|'
+                << context.inventory_blueprint << '|'
+                << context.owner_blueprint << '|'
+                << context.owner_class_blueprint;
+    return fingerprint.str();
+}
+
 void PluginModule::RegisterHooks() {
     if (hooks_registered_) {
         return;
@@ -220,7 +321,26 @@ void PluginModule::RegisterHooks() {
             return;
         }
 
+        const auto anti_dupe = EvaluateAntiDupe(context, decision);
+        if (!anti_dupe.allowed) {
+            if (config_.LogAntiDupeEvents || config_.DebugLogging) {
+                std::ostringstream blocked;
+                blocked << "FasolaFlintScaler anti-dupe: blocked harvest adjustment"
+                        << " reason=\"" << anti_dupe.reason << "\""
+                        << ", original_amount=" << decision.original_amount
+                        << ", target_amount=" << decision.target_amount
+                        << ", add_amount=" << decision.add_amount
+                        << ", item_class_bp=" << EmptyText(context.item_blueprint)
+                        << ", inventory_class_bp=" << EmptyText(context.inventory_blueprint)
+                        << ", owner_class_bp=" << EmptyText(context.owner_class_blueprint);
+                logger_.Warn(blocked.str());
+            }
+            return;
+        }
+
         api_.AddFlintToInventory(context, decision.add_amount);
+        RecordAntiDupeAccepted(context, decision);
+
         if (config_.ShowHudNotificationForExtraFlint) {
             api_.NotifyExtraFlint(context, decision);
         }
@@ -255,6 +375,7 @@ void PluginModule::UnregisterHooks() {
 
     api_.UnregisterHarvestHooks();
     hooks_registered_ = false;
+    ResetAntiDupeState();
 }
 
 PluginModule& GetPluginModule() {

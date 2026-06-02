@@ -62,6 +62,8 @@ The runtime file is `config.json`. Keep it as strict JSON. Use `config_commented
 | `FasolaClasses` | Character blueprint classes treated as Fasola targets. |
 | `FlintClass` | Flint resource blueprint class. |
 
+Anti-dupe guardrails are evaluated after the scaler chooses an adjustment and before the plugin writes extra flint to the inventory. Blocked adjustments are skipped without modifying the stack.
+
 ## Commands
 
 Run these from the server console:
