@@ -1,12 +1,13 @@
 # Pre-Live-Test Checklist
 
-Use this checklist before the first server compile or live test pass.
+Use this checklist before the first approved compile or live test pass.
 
 ## Source State
 
 - Confirm the branch is `krit-faslo-full-build`.
 - Confirm the working tree is clean before copying or compiling anything.
 - Confirm no DLL exists under `rebuild-source/`.
+- Confirm no compile has been run unless the compile step was explicitly approved.
 - Confirm the source package is reviewed from:
 
 ```text
@@ -62,7 +63,7 @@ $env:ASA_API_LIB_ROOT = "C:\Users\Administrator\Downloads\AsaApi_1.19"
 
 ## First Server Boot Checks
 
-- Confirm the plugin loads without missing dependency errors.
+- After the approved compile/install step, confirm the plugin loads without missing dependency errors.
 - Confirm the license validation log reports accepted status.
 - Confirm the harvest hooks register for `IncrementItemQuantity`, `AddItem`, and `AddItemObject`.
 - Confirm no warning appears for a hook other than the documented `AddItemObjectEx` note.

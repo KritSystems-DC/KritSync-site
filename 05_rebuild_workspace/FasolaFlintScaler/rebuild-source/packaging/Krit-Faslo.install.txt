@@ -1,8 +1,8 @@
-Install folder:
+Install folder after the approved compile step:
 
 ShooterGame/Binaries/Win64/ArkApi/Plugins/Krit-Faslo/
 
-Release contents:
+Runtime contents after `Krit-Faslo.dll` has been produced:
 
 Krit-Faslo/
   Krit-Faslo.dll

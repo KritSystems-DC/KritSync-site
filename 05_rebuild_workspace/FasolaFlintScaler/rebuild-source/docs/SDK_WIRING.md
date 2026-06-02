@@ -1,6 +1,6 @@
 # ASA SDK Wiring
 
-This project is ready for the ASA runtime library path, but exact harvest hook detour signatures still require the ASA API developer headers.
+This project is wired for the ASA 1.19 header source tree and the separate ASA runtime/library package.
 
 ## Known Runtime Root
 
@@ -17,7 +17,7 @@ ArkApi\AsaApi.dll
 Lib\AsaApi.lib
 ```
 
-It does not appear to contain developer headers.
+It does not appear to contain developer headers, so it should be used as the runtime/library root rather than the header root.
 
 ## Matching Header Source
 
@@ -38,7 +38,7 @@ $env:ASA_API_LIB_ROOT = "C:\Users\Administrator\Downloads\AsaApi_1.19"
 
 ## Required Developer Headers
 
-Exact hook wiring needs files such as:
+The hook wiring was verified against files such as:
 
 ```text
 AsaApi.h
@@ -48,9 +48,9 @@ Commands.h
 API\ARK\Ark.h
 ```
 
-Without these headers, the bridge can document and centralize recovered hook names, but should not guess detour signatures.
+Without these headers, future hook changes should not guess detour signatures.
 
-## Recovered Hook Names
+## Verified Hook Names
 
 The hook names are centralized in `src/ArkApiBridge.cpp`:
 
@@ -61,7 +61,7 @@ UPrimalInventoryComponent.AddItemObject(UPrimalItem*)
 UPrimalInventoryComponent.AddItemObjectEx
 ```
 
-`AddItemObjectEx` was recovered from the original binary but is not present in the ASA API 1.19 headers. The source does not guess its detour signature.
+`IncrementItemQuantity`, `AddItem`, and `AddItemObject` are wired from the ASA 1.19 headers. `AddItemObjectEx` was recovered from the original binary but is not present in those headers, so the source intentionally does not hook it.
 
 ## Preflight
 

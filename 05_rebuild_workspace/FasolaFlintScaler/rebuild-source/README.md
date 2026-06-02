@@ -25,13 +25,14 @@ rebuild-source/
 - ArkServerAPI / ASA Server API headers and import library
 - Microsoft Visual C++ Redistributable installed on the server
 
-Set `ASA_API_ROOT` to the folder that contains the ASA API headers and `AsaApi.lib`.
+Set `ASA_API_ROOT` to the folder that contains the ASA API headers. Set `ASA_API_LIB_ROOT` to the folder that contains `AsaApi.lib` and the server runtime DLL when those files live somewhere else.
 
 ```powershell
-$env:ASA_API_ROOT = "C:\Path\To\ArkApi"
+$env:ASA_API_ROOT = "C:\Users\sutto\Downloads\AsaApi-1.19\AsaApi-1.19"
+$env:ASA_API_LIB_ROOT = "C:\Users\Administrator\Downloads\AsaApi_1.19"
 ```
 
-The CMake finder checks common ASA API source and install layouts below that root, including `include`, `ArkApi`, `AsaApi`, `Binaries/Win64`, and common Visual Studio output folders.
+The CMake finder checks common ASA API source and install layouts below those roots, including public/private source headers, `ArkApi`, `AsaApi`, `Binaries/Win64`, `Lib`, and common Visual Studio output folders.
 
 ## Configuration
 
@@ -100,7 +101,7 @@ Expected payload fields:
 
 ## Installation
 
-Install the release folder here:
+After the approved compile step creates `Krit-Faslo.dll`, install the plugin folder here:
 
 ```text
 ShooterGame/Binaries/Win64/ArkApi/Plugins/Krit-Faslo/
@@ -124,7 +125,7 @@ Krit-Faslo/
 
 ## Build
 
-Do not build from this workspace until the compile step has been requested.
+Do not build from this workspace until the compile step has been explicitly requested.
 
 Before building, run the non-compile preflight:
 
@@ -143,7 +144,7 @@ cmake --build build --config Release
 
 The output DLL is named `Krit-Faslo.dll`.
 
-The recovered harvest hook names are centralized in `src/ArkApiBridge.cpp`. Final detour signatures must be matched against the installed ASA API headers before compiling.
+The verified ASA 1.19 harvest hook names and detour signatures are centralized in `src/ArkApiBridge.cpp`.
 
 ## SDK Wiring Status
 

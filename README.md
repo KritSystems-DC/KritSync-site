@@ -52,7 +52,9 @@ The non-compile preflight script is:
 
 ```powershell
 cd "05_rebuild_workspace/FasolaFlintScaler/rebuild-source"
-.\scripts\Preflight.ps1
+.\scripts\Preflight.ps1 `
+  -AsaApiRoot "C:\Users\sutto\Downloads\AsaApi-1.19\AsaApi-1.19" `
+  -AsaApiLibRoot "C:\Users\Administrator\Downloads\AsaApi_1.19"
 ```
 
 That script checks config shape, SDK paths, and confirms no DLLs exist in the source package. It does not build.
