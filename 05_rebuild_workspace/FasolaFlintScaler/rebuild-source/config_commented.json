@@ -59,8 +59,8 @@
   // Sends a HUD message when extra flint is added.
   "ShowHudNotificationForExtraFlint": false,
 
-  // Writes additional diagnostics to FasolaFlintScaler.debug.log.
-  "DebugLogging": false,
+  // Writes additional diagnostics to FasolaFlintScaler.debug.log. Keep enabled for the first controlled live-test pass.
+  "DebugLogging": true,
 
   // Character blueprint classes treated as Fasola targets.
   "FasolaClasses": [
