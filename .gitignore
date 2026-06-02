@@ -1,4 +1,6 @@
 03_license_admin/krit-faslo-private-key.json
+03_license_admin/*license*.txt
+03_license_admin/*license*.json
 
 # Build outputs and generated binaries
 build/

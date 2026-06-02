@@ -39,6 +39,8 @@ server locking because no stable ASA server identifier has been selected.
 The command prints a license string beginning with `KFASLO-v1.`. Give that full
 string to the user and have them paste it into `LicenseKey` in `config.json`.
 
+For the test server workflow, see `TEST_LICENSE_WORKFLOW.md`.
+
 ## Verify a License
 
 ```powershell
@@ -47,7 +49,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\KritFaslo-LicenseTool.
 
 Verification checks the signature, product name, version, and expiry date.
 
-## DLL Requirement
+## Plugin Requirement
 
 This tool only generates and verifies licenses externally. For licensing to be
 enforced by the ASA plugin, the Krit-Faslo plugin source must read

@@ -1,10 +1,17 @@
 param(
   [string]$AsaApiRoot = $env:ASA_API_ROOT,
-  [string]$AsaApiLibRoot = $env:ASA_API_LIB_ROOT
+  [string]$AsaApiLibRoot = $env:ASA_API_LIB_ROOT,
+  [string]$LicenseAdminRoot = $env:KRIT_FASLO_LICENSE_ADMIN_ROOT
 )
 
 $ErrorActionPreference = 'Stop'
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
+if ([string]::IsNullOrWhiteSpace($LicenseAdminRoot)) {
+  $LicenseAdminRoot = Join-Path $ProjectRoot '..\..\..\03_license_admin'
+}
+if (Test-Path -LiteralPath $LicenseAdminRoot) {
+  $LicenseAdminRoot = (Resolve-Path -LiteralPath $LicenseAdminRoot).Path
+}
 
 function Write-Section {
   param([string]$Title)
@@ -104,6 +111,17 @@ if ($null -ne $config) {
   Write-Value 'MinTriggerAmount' (Get-ConfigValue $config 'MinTriggerAmount')
   Write-Value 'MaxTriggerAmount' (Get-ConfigValue $config 'MaxTriggerAmount')
   Write-Value 'VariancePercent' (Get-ConfigValue $config 'VariancePercent')
+
+  Write-Section 'License Admin'
+  $licenseAdminExists = Test-Path -LiteralPath $LicenseAdminRoot
+  $publicKeyPath = Join-Path $LicenseAdminRoot 'krit-faslo-public-key.json'
+  $privateKeyPath = Join-Path $LicenseAdminRoot 'krit-faslo-private-key.json'
+  $licenseToolPath = Join-Path $LicenseAdminRoot 'KritFaslo-LicenseTool.ps1'
+
+  Write-Result 'Admin folder' $licenseAdminExists $LicenseAdminRoot
+  Write-Result 'License tool' (Test-Path -LiteralPath $licenseToolPath) $licenseToolPath
+  Write-Result 'Public key' (Test-Path -LiteralPath $publicKeyPath) $publicKeyPath
+  Write-Result 'Private key' (Test-Path -LiteralPath $privateKeyPath) $(if (Test-Path -LiteralPath $privateKeyPath) { 'present locally; do not commit or ship' } else { 'not present locally; cannot issue a matching test license here' })
 
   Write-Section 'Anti-Dupe'
   Write-Value 'AntiDupeEnabled' (Get-ConfigValue $config 'AntiDupeEnabled')

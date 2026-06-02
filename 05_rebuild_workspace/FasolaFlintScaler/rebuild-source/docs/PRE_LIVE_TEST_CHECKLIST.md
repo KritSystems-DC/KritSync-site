@@ -18,6 +18,7 @@ Use this checklist before the first approved compile or live test pass.
 
 - Open `config.json` and confirm `Enabled` is set for the intended test.
 - Confirm `LicenseKey` is populated with a valid `KFASLO-v1` license before expecting runtime behavior.
+- Confirm `03_license_admin/TEST_LICENSE_WORKFLOW.md` has been followed on a machine with the matching private signing key.
 - Confirm `HarvestMultiplier`, `TargetFlintMin`, `TargetFlintMax`, `MinTriggerAmount`, `MaxTriggerAmount`, and `VariancePercent` match the test server target.
 - Confirm `FasolaClasses` contains the exact Fasola blueprint class names expected on the test server.
 - Confirm `FlintClass` matches the flint resource class used by the server.
