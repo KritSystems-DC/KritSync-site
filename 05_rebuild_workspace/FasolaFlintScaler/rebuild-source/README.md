@@ -31,6 +31,8 @@ Set `ASA_API_ROOT` to the folder that contains the ASA API headers and `AsaApi.l
 $env:ASA_API_ROOT = "C:\Path\To\ArkApi"
 ```
 
+The CMake finder checks common ASA API source and install layouts below that root, including `include`, `ArkApi`, `AsaApi`, `Binaries/Win64`, and common Visual Studio output folders.
+
 ## Configuration
 
 The runtime file is `config.json`. Keep it as strict JSON. Use `CONFIG-COMMENTED.jsonc` or `config_commented.json` as the readable reference.
@@ -65,9 +67,27 @@ faslo.status
 
 ## Licensing
 
-`LicenseKey` must use the `KFASLO-v1` token format. The plugin validates product, version, expiry, and signature before enabling behavior.
+`LicenseKey` must use this token format:
+
+```text
+KFASLO-v1.<base64url-payload-json>.<base64url-rsa-signature>
+```
+
+The plugin validates the RSA-3072/SHA-256 PKCS#1 signature, product, version, and expiry before enabling behavior.
 
 Only public verification material belongs in the plugin. Keep private signing material and license issuing tools off the game server.
+
+Expected payload fields:
+
+| Field | Description |
+| --- | --- |
+| `product` | Must be `Krit-Faslo`. |
+| `version` | Must be `1`. |
+| `customer` | Display/audit value. |
+| `issuedUtc` | UTC issue timestamp. |
+| `expires` | Expiry date in `YYYY-MM-DD` format. |
+| `serverId` | Optional metadata. |
+| `nonce` | Unique token id. |
 
 ## Installation
 
@@ -105,6 +125,8 @@ cmake --build build --config Release
 ```
 
 The output DLL is named `Krit-Faslo.dll`.
+
+The recovered harvest hook names are centralized in `src/ArkApiBridge.cpp`. Final detour signatures must be matched against the installed ASA API headers before compiling.
 
 ## Troubleshooting
 

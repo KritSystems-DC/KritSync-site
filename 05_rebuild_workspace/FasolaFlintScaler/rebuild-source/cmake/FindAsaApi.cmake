@@ -1,12 +1,26 @@
 find_path(ASAAPI_INCLUDE_DIR
-    NAMES AsaApi.h ArkApi.h API/ARK/Ark.h
-    PATHS "${ASA_API_ROOT}" "${ASA_API_ROOT}/include" "${ASA_API_ROOT}/ArkApi"
+    NAMES AsaApi.h ArkApi.h API/ARK/Ark.h AsaApi/Core/Public/IHooks.h
+    PATHS
+        "${ASA_API_ROOT}"
+        "${ASA_API_ROOT}/include"
+        "${ASA_API_ROOT}/ArkApi"
+        "${ASA_API_ROOT}/AsaApi"
+        "${ASA_API_ROOT}/AsaApi/AsaApi/Core/Public"
+        "${ASA_API_ROOT}/AsaApi/AsaApi/Core/Private"
+        "${ASA_API_ROOT}/AsaApi/AsaApi"
     NO_DEFAULT_PATH
 )
 
 find_library(ASAAPI_LIBRARY
     NAMES AsaApi ArkApi
-    PATHS "${ASA_API_ROOT}" "${ASA_API_ROOT}/lib" "${ASA_API_ROOT}/Lib" "${ASA_API_ROOT}/Binaries/Win64"
+    PATHS
+        "${ASA_API_ROOT}"
+        "${ASA_API_ROOT}/lib"
+        "${ASA_API_ROOT}/Lib"
+        "${ASA_API_ROOT}/Binaries/Win64"
+        "${ASA_API_ROOT}/AsaApi/x64/Release"
+        "${ASA_API_ROOT}/AsaApi/Lib"
+        "${ASA_API_ROOT}/Win64"
     NO_DEFAULT_PATH
 )
 

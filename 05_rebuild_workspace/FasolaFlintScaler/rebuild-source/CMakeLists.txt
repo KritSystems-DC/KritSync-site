@@ -40,6 +40,7 @@ target_link_libraries(FasolaFlintScaler
     PRIVATE
         "${ASAAPI_LIBRARY}"
         bcrypt
+        crypt32
 )
 
 target_compile_definitions(FasolaFlintScaler

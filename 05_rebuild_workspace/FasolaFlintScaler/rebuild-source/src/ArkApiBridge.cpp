@@ -118,6 +118,14 @@ void ArkApiBridge::UnregisterHarvestHooks() {
         return;
     }
 
+#if FASOLA_WITH_ASA_API
+#if __has_include(<AsaApi.h>) || __has_include(<ArkApi.h>) || __has_include(<API/ARK/Ark.h>)
+    for (const auto* hook_name : kHarvestHookNames) {
+        (void)hook_name;
+    }
+#endif
+#endif
+
     hooks_registered_ = false;
     flint_callback_ = {};
 
