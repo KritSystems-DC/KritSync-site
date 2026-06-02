@@ -129,7 +129,9 @@ Do not build from this workspace until the compile step has been requested.
 Before building, run the non-compile preflight:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Preflight.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Preflight.ps1 `
+  -AsaApiRoot "C:\Users\sutto\Downloads\AsaApi-1.19\AsaApi-1.19" `
+  -AsaApiLibRoot "C:\Users\Administrator\Downloads\AsaApi_1.19"
 ```
 
 When building is intended, configure from the project root:
