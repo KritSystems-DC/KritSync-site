@@ -51,19 +51,29 @@ AddItemObjectOriginal g_add_item_object_original = nullptr;
 bool g_suppress_increment_hook = false;
 
 std::string Narrow(const FString& value) {
-    const wchar_t* text = *value;
-    if (text == nullptr || *text == L'\0') {
-        return {};
+    return value.ToStringUTF8();
+}
+
+class IncrementHookSuppression {
+public:
+    IncrementHookSuppression() {
+        previous_ = g_suppress_increment_hook;
+        g_suppress_increment_hook = true;
     }
 
-    const int needed = WideCharToMultiByte(CP_UTF8, 0, text, -1, nullptr, 0, nullptr, nullptr);
-    if (needed <= 1) {
-        return {};
+    ~IncrementHookSuppression() {
+        g_suppress_increment_hook = previous_;
     }
 
-    std::string result(static_cast<size_t>(needed - 1), '\0');
-    WideCharToMultiByte(CP_UTF8, 0, text, -1, result.data(), needed, nullptr, nullptr);
-    return result;
+    IncrementHookSuppression(const IncrementHookSuppression&) = delete;
+    IncrementHookSuppression& operator=(const IncrementHookSuppression&) = delete;
+
+private:
+    bool previous_ = false;
+};
+
+int SafeItemQuantity(UPrimalItem* item) {
+    return item != nullptr ? item->GetItemQuantity() : 0;
 }
 
 std::string ObjectPath(UObject* object) {
@@ -91,7 +101,7 @@ FlintContext MakeContext(UPrimalItem* item, UPrimalInventoryComponent* inventory
     if (item != nullptr) {
         context.item_blueprint = ClassPath(item);
         if (amount <= 0) {
-            context.amount = item->GetItemQuantity();
+            context.amount = SafeItemQuantity(item);
         }
 
         if (AActor* owner = item->GetOwnerActor()) {
@@ -111,7 +121,7 @@ int Hook_UPrimalItem_IncrementItemQuantity(UPrimalItem* item, int amount, bool r
                                            bool dont_update_weight, bool is_from_use_consumption,
                                            bool is_ark_tribute_item, bool is_from_crafting_consumption) {
     if (g_increment_item_quantity_original == nullptr) {
-        return item != nullptr ? item->GetItemQuantity() : 0;
+        return SafeItemQuantity(item);
     }
 
     const int result = g_increment_item_quantity_original(
@@ -166,7 +176,7 @@ UPrimalItem* Hook_UPrimalInventoryComponent_AddItem(
         dont_have_client_refresh_attachments_after_updating_item);
 
     if (g_bridge != nullptr && item != nullptr) {
-        g_bridge->DispatchFlintContext(MakeContext(item, inventory, item->GetItemQuantity()));
+        g_bridge->DispatchFlintContext(MakeContext(item, inventory, SafeItemQuantity(item)));
     }
 
     return item;
@@ -180,7 +190,7 @@ UPrimalItem* Hook_UPrimalInventoryComponent_AddItemObject(UPrimalInventoryCompon
     UPrimalItem* result = g_add_item_object_original(inventory, item);
 
     if (g_bridge != nullptr && result != nullptr) {
-        g_bridge->DispatchFlintContext(MakeContext(result, inventory, result->GetItemQuantity()));
+        g_bridge->DispatchFlintContext(MakeContext(result, inventory, SafeItemQuantity(result)));
     }
 
     return result;
@@ -216,7 +226,7 @@ std::filesystem::path ArkApiBridge::PluginDirectory() const {
 bool ArkApiBridge::RegisterCommand(const std::string& command, CommandCallback callback) {
 #if FASOLA_WITH_ASA_API
 #if __has_include(<AsaApi.h>) || __has_include(<ArkApi.h>) || __has_include(<API/ARK/Ark.h>)
-    AsaApi::GetCommands().AddConsoleCommand(FString(command.c_str()),
+    AsaApi::GetCommands().AddConsoleCommand(FString::FromString(command),
         [callback = std::move(callback)](APlayerController*, FString*, bool) {
             callback();
         });
@@ -243,7 +253,7 @@ bool ArkApiBridge::RegisterCommand(const std::string& command, CommandCallback c
 void ArkApiBridge::UnregisterCommand(const std::string& command) {
 #if FASOLA_WITH_ASA_API
 #if __has_include(<AsaApi.h>) || __has_include(<ArkApi.h>) || __has_include(<API/ARK/Ark.h>)
-    AsaApi::GetCommands().RemoveConsoleCommand(FString(command.c_str()));
+    AsaApi::GetCommands().RemoveConsoleCommand(FString::FromString(command));
 #endif
 #endif
     if (logger_) {
@@ -263,8 +273,8 @@ bool ArkApiBridge::RegisterHarvestHooks(FlintCallback callback) {
     const bool add_item_object_hook = hooks.SetHook(kHarvestHookNames[2], &Hook_UPrimalInventoryComponent_AddItemObject,
                                                    &g_add_item_object_original);
 
-    g_bridge = this;
     hooks_registered_ = increment_hook || add_item_hook || add_item_object_hook;
+    g_bridge = hooks_registered_ ? this : nullptr;
 
     if (logger_) {
         logger_->Debug(std::string("registered harvest hook bridge for ") + kHarvestHookNames[0]
@@ -340,9 +350,8 @@ void ArkApiBridge::AddFlintToInventory(const FlintContext& context, int amount) 
     }
 
     auto* item = static_cast<UPrimalItem*>(context.native_item);
-    g_suppress_increment_hook = true;
+    const IncrementHookSuppression suppress_increment_hook;
     item->IncrementItemQuantity(amount, true, false, false, false, false);
-    g_suppress_increment_hook = false;
 #else
     (void)context;
     (void)amount;
