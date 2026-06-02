@@ -167,6 +167,8 @@ $env:ASA_API_LIB_ROOT = "C:\Users\Administrator\Downloads\AsaApi_1.19"
 
 `src/ArkApiBridge.cpp` uses the confirmed 1.19 signatures for `IncrementItemQuantity`, `AddItem`, and `AddItemObject`. `AddItemObjectEx` was recovered from the original binary but is not declared in the ASA API 1.19 headers, so it is documented but not hooked. See `docs/SDK_WIRING.md`.
 
+Before the first live server test, review `docs/PRE_LIVE_TEST_CHECKLIST.md`.
+
 ## Troubleshooting
 
 - If CMake cannot find ASA API, verify `ASA_API_ROOT`.
