@@ -10,7 +10,7 @@ The internal module name is `FasolaFlintScaler`; the release DLL name is `Krit-F
 rebuild-source/
   CMakeLists.txt
   config.json
-  CONFIG-COMMENTED.jsonc
+  config_commented.json
   include/FasolaFlintScaler/
   src/
   third_party/nlohmann/
@@ -35,7 +35,7 @@ The CMake finder checks common ASA API source and install layouts below that roo
 
 ## Configuration
 
-The runtime file is `config.json`. Keep it as strict JSON. Use `CONFIG-COMMENTED.jsonc` or `config_commented.json` as the readable reference.
+The runtime file is `config.json`. Keep it as strict JSON. Use `config_commented.json` as the readable reference.
 
 | Setting | Description |
 | --- | --- |
@@ -109,7 +109,7 @@ Optional documentation files can also be kept beside the runtime files:
 
 ```text
 Krit-Faslo/
-  CONFIG-COMMENTED.jsonc
+  config_commented.json
   README.md
 ```
 

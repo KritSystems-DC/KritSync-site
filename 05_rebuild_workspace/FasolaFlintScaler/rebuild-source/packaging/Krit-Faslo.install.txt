@@ -11,7 +11,7 @@ Krit-Faslo/
 Optional documentation files:
 
 Krit-Faslo/
-  CONFIG-COMMENTED.jsonc
+  config_commented.json
   README.md
 
 Do not place private license signing material on the game server.
