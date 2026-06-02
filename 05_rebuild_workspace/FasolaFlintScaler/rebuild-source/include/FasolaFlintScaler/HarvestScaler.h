@@ -11,6 +11,8 @@ namespace FasolaFlintScaler {
 
 struct FlintContext {
     int amount = 0;
+    void* native_item = nullptr;
+    void* native_inventory = nullptr;
     std::string item_blueprint;
     std::string item_archetype_blueprint;
     std::string inventory_blueprint;

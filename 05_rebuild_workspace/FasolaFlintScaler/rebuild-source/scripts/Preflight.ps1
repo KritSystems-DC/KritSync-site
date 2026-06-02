@@ -1,5 +1,6 @@
 param(
-  [string]$AsaApiRoot = $env:ASA_API_ROOT
+  [string]$AsaApiRoot = $env:ASA_API_ROOT,
+  [string]$AsaApiLibRoot = $env:ASA_API_LIB_ROOT
 )
 
 $ErrorActionPreference = 'Stop'
@@ -39,14 +40,19 @@ catch {
 
 Write-Result 'No DLLs' ($dlls.Count -eq 0) "$($dlls.Count) DLL file(s) under source root"
 
+if ([string]::IsNullOrWhiteSpace($AsaApiLibRoot)) {
+  $AsaApiLibRoot = $AsaApiRoot
+}
+
 if ([string]::IsNullOrWhiteSpace($AsaApiRoot)) {
   Write-Result 'ASA_API_ROOT' $false 'set ASA_API_ROOT or pass -AsaApiRoot'
 }
 else {
   Write-Result 'ASA_API_ROOT' (Test-Path $AsaApiRoot) $AsaApiRoot
+  Write-Result 'ASA_API_LIB_ROOT' (-not [string]::IsNullOrWhiteSpace($AsaApiLibRoot) -and (Test-Path $AsaApiLibRoot)) $AsaApiLibRoot
 
-  $lib = Get-ChildItem -Path $AsaApiRoot -Recurse -Filter 'AsaApi.lib' -ErrorAction SilentlyContinue | Select-Object -First 1
-  $dll = Get-ChildItem -Path $AsaApiRoot -Recurse -Filter 'AsaApi.dll' -ErrorAction SilentlyContinue | Select-Object -First 1
+  $lib = Get-ChildItem -Path $AsaApiLibRoot -Recurse -Filter 'AsaApi.lib' -ErrorAction SilentlyContinue | Select-Object -First 1
+  $dll = Get-ChildItem -Path $AsaApiLibRoot -Recurse -Filter 'AsaApi.dll' -ErrorAction SilentlyContinue | Select-Object -First 1
   $headers = Get-ChildItem -Path $AsaApiRoot -Recurse -File -ErrorAction SilentlyContinue |
     Where-Object { $_.Name -in 'AsaApi.h', 'ArkApi.h', 'IHooks.h', 'Commands.h' }
 

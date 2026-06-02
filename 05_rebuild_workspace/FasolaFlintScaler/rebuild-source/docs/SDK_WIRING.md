@@ -19,6 +19,23 @@ Lib\AsaApi.lib
 
 It does not appear to contain developer headers.
 
+## Matching Header Source
+
+The matching ASA API 1.19 source headers were found locally under:
+
+```text
+C:\Users\sutto\Downloads\AsaApi-1.19\AsaApi-1.19
+```
+
+For source wiring, point `ASA_API_ROOT` to that folder. It contains the public/private API headers needed to inspect command and hook signatures.
+
+When headers and runtime files are in different folders, use:
+
+```powershell
+$env:ASA_API_ROOT = "C:\Users\sutto\Downloads\AsaApi-1.19\AsaApi-1.19"
+$env:ASA_API_LIB_ROOT = "C:\Users\Administrator\Downloads\AsaApi_1.19"
+```
+
 ## Required Developer Headers
 
 Exact hook wiring needs files such as:
@@ -38,19 +55,22 @@ Without these headers, the bridge can document and centralize recovered hook nam
 The hook names are centralized in `src/ArkApiBridge.cpp`:
 
 ```text
-UPrimalItem.IncrementItemQuantity
-UPrimalInventoryComponent.AddItem
-UPrimalInventoryComponent.AddItemObject
+UPrimalItem.IncrementItemQuantity(int,bool,bool,bool,bool,bool)
+UPrimalInventoryComponent.AddItem(FItemNetInfo&,bool,bool,bool,FItemNetID*,bool,bool,bool,AShooterCharacter*,bool,bool,bool,bool)
+UPrimalInventoryComponent.AddItemObject(UPrimalItem*)
 UPrimalInventoryComponent.AddItemObjectEx
 ```
+
+`AddItemObjectEx` was recovered from the original binary but is not present in the ASA API 1.19 headers. The source does not guess its detour signature.
 
 ## Preflight
 
 Run this without compiling:
 
 ```powershell
-$env:ASA_API_ROOT = "C:\Users\Administrator\Downloads\AsaApi_1.19"
-.\scripts\Preflight.ps1
+$env:ASA_API_ROOT = "C:\Users\sutto\Downloads\AsaApi-1.19\AsaApi-1.19"
+$env:ASA_API_LIB_ROOT = "C:\Users\Administrator\Downloads\AsaApi_1.19"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Preflight.ps1
 ```
 
 The preflight checks config parsing, runtime API files, header availability, and confirms no DLL is present under the source root.

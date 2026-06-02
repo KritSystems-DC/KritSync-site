@@ -15,6 +15,12 @@ if(NOT DEFINED ENV{ASA_API_ROOT})
 endif()
 
 set(ASA_API_ROOT "$ENV{ASA_API_ROOT}" CACHE PATH "ArkServerAPI / ASA API root")
+if(DEFINED ENV{ASA_API_LIB_ROOT})
+    set(ASA_API_LIB_ROOT "$ENV{ASA_API_LIB_ROOT}" CACHE PATH "ArkServerAPI / ASA API library/runtime root")
+else()
+    set(ASA_API_LIB_ROOT "${ASA_API_ROOT}" CACHE PATH "ArkServerAPI / ASA API library/runtime root")
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 find_package(AsaApi REQUIRED)
 

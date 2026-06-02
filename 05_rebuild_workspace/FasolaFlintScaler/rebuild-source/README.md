@@ -136,13 +136,27 @@ The recovered harvest hook names are centralized in `src/ArkApiBridge.cpp`. Fina
 
 ## SDK Wiring Status
 
-The runtime package path can be set with:
+The runtime package path found on the server is:
 
 ```powershell
 $env:ASA_API_ROOT = "C:\Users\Administrator\Downloads\AsaApi_1.19"
 ```
 
-That runtime package supplies `AsaApi.dll` and `AsaApi.lib`. Exact harvest hook signatures still require the ASA API developer headers. See `docs/SDK_WIRING.md`.
+That runtime package supplies `AsaApi.dll` and `AsaApi.lib`.
+
+The matching ASA API 1.19 source headers were found locally under:
+
+```powershell
+$env:ASA_API_ROOT = "C:\Users\sutto\Downloads\AsaApi-1.19\AsaApi-1.19"
+```
+
+If the headers and runtime package are separate, set the library/runtime root too:
+
+```powershell
+$env:ASA_API_LIB_ROOT = "C:\Users\Administrator\Downloads\AsaApi_1.19"
+```
+
+`src/ArkApiBridge.cpp` uses the confirmed 1.19 signatures for `IncrementItemQuantity`, `AddItem`, and `AddItemObject`. `AddItemObjectEx` was recovered from the original binary but is not declared in the ASA API 1.19 headers, so it is documented but not hooked. See `docs/SDK_WIRING.md`.
 
 ## Troubleshooting
 

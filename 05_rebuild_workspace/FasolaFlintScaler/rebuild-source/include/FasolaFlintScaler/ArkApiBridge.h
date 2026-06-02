@@ -26,6 +26,7 @@ public:
     bool RegisterHarvestHooks(FlintCallback callback);
     void UnregisterHarvestHooks();
 
+    void DispatchFlintContext(const FlintContext& context);
     void NotifyExtraFlint(const FlintContext& context, const ScaleDecision& decision);
     void AddFlintToInventory(const FlintContext& context, int amount);
 
