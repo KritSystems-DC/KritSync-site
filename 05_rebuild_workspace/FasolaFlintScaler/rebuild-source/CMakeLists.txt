@@ -39,7 +39,7 @@ target_include_directories(FasolaFlintScaler
     PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
         "${CMAKE_CURRENT_SOURCE_DIR}/third_party"
-        "${ASAAPI_INCLUDE_DIR}"
+        ${ASAAPI_INCLUDE_DIRS}
 )
 
 target_link_libraries(FasolaFlintScaler

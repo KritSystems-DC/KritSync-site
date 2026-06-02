@@ -74,3 +74,19 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Preflight.ps1
 ```
 
 The preflight checks config parsing, runtime API files, header availability, and confirms no DLL is present under the source root.
+
+## CMake Finder Behavior
+
+`cmake/FindAsaApi.cmake` supports split SDK roots:
+
+- `ASA_API_ROOT` is used for headers.
+- `ASA_API_LIB_ROOT` is used for `AsaApi.lib` and `AsaApi.dll`.
+
+The finder adds both ASA public and private header folders to the plugin include path when they exist. This is required for the 1.19 source layout, where command/hook headers are split between:
+
+```text
+AsaApi\Core\Public
+AsaApi\Core\Private
+```
+
+The runtime DLL is reported during configure as a readiness check, but the import library is the required linker input.
