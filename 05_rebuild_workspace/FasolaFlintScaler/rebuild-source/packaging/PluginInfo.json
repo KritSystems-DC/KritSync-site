@@ -1,0 +1,8 @@
+{
+  "Name": "Krit-Faslo",
+  "FriendlyName": "Krit-Faslo",
+  "Description": "Fasola flint scaling plugin for ArkServerAPI / ASA Server API.",
+  "Version": "1.0.0",
+  "Author": "Krit Systems",
+  "Module": "Krit-Faslo.dll"
+}

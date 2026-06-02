@@ -117,6 +117,12 @@ Krit-Faslo/
 
 Do not build from this workspace until the compile step has been requested.
 
+Before building, run the non-compile preflight:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Preflight.ps1
+```
+
 When building is intended, configure from the project root:
 
 ```powershell
@@ -127,6 +133,16 @@ cmake --build build --config Release
 The output DLL is named `Krit-Faslo.dll`.
 
 The recovered harvest hook names are centralized in `src/ArkApiBridge.cpp`. Final detour signatures must be matched against the installed ASA API headers before compiling.
+
+## SDK Wiring Status
+
+The runtime package path can be set with:
+
+```powershell
+$env:ASA_API_ROOT = "C:\Users\Administrator\Downloads\AsaApi_1.19"
+```
+
+That runtime package supplies `AsaApi.dll` and `AsaApi.lib`. Exact harvest hook signatures still require the ASA API developer headers. See `docs/SDK_WIRING.md`.
 
 ## Troubleshooting
 
