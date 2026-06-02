@@ -19,6 +19,13 @@ struct Config {
     int MinTriggerAmount = 1;
     int MaxTriggerAmount = 120;
     int VariancePercent = 10;
+    bool AntiDupeEnabled = true;
+    bool LogAntiDupeEvents = true;
+    int MaxExtraFlintPerStack = 700;
+    int MaxExtraFlintPerSecond = 2500;
+    int DuplicateDetectionWindowMs = 750;
+    bool BlockNegativeOrZeroAdjustments = true;
+    bool RequireFasolaOwnerMatch = true;
     bool ShowHudNotificationForExtraFlint = false;
     bool DebugLogging = false;
     std::vector<std::string> FasolaClasses{

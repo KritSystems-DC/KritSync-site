@@ -50,6 +50,13 @@ The runtime file is `config.json`. Keep it as strict JSON. Use `config_commented
 | `MinTriggerAmount` | Minimum incoming stack amount that can be adjusted. |
 | `MaxTriggerAmount` | Maximum incoming stack amount that can be adjusted. |
 | `VariancePercent` | Allowed tolerance around the selected target amount. |
+| `AntiDupeEnabled` | Enables anti-dupe guardrails before extra flint is added. |
+| `LogAntiDupeEvents` | Logs anti-dupe rejection details when suspicious events are blocked. |
+| `MaxExtraFlintPerStack` | Maximum extra flint one stack adjustment can add. |
+| `MaxExtraFlintPerSecond` | Maximum extra flint the plugin may add per second. |
+| `DuplicateDetectionWindowMs` | Time window used to catch repeated identical events too close together. |
+| `BlockNegativeOrZeroAdjustments` | Rejects zero, negative, or invalid extra-flint adjustments. |
+| `RequireFasolaOwnerMatch` | Requires the item owner or inventory to match a configured Fasola class. |
 | `ShowHudNotificationForExtraFlint` | Sends a HUD notice when extra flint is added. |
 | `DebugLogging` | Writes diagnostics to `FasolaFlintScaler.debug.log`. |
 | `FasolaClasses` | Character blueprint classes treated as Fasola targets. |

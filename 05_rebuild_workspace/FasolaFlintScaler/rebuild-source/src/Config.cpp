@@ -55,6 +55,13 @@ ConfigLoadResult LoadConfigFile(const std::filesystem::path& path) {
         AssignIfPresent(json, "MinTriggerAmount", result.config.MinTriggerAmount, result.warnings);
         AssignIfPresent(json, "MaxTriggerAmount", result.config.MaxTriggerAmount, result.warnings);
         AssignIfPresent(json, "VariancePercent", result.config.VariancePercent, result.warnings);
+        AssignIfPresent(json, "AntiDupeEnabled", result.config.AntiDupeEnabled, result.warnings);
+        AssignIfPresent(json, "LogAntiDupeEvents", result.config.LogAntiDupeEvents, result.warnings);
+        AssignIfPresent(json, "MaxExtraFlintPerStack", result.config.MaxExtraFlintPerStack, result.warnings);
+        AssignIfPresent(json, "MaxExtraFlintPerSecond", result.config.MaxExtraFlintPerSecond, result.warnings);
+        AssignIfPresent(json, "DuplicateDetectionWindowMs", result.config.DuplicateDetectionWindowMs, result.warnings);
+        AssignIfPresent(json, "BlockNegativeOrZeroAdjustments", result.config.BlockNegativeOrZeroAdjustments, result.warnings);
+        AssignIfPresent(json, "RequireFasolaOwnerMatch", result.config.RequireFasolaOwnerMatch, result.warnings);
         AssignIfPresent(json, "ShowHudNotificationForExtraFlint", result.config.ShowHudNotificationForExtraFlint, result.warnings);
         AssignIfPresent(json, "DebugLogging", result.config.DebugLogging, result.warnings);
         AssignIfPresent(json, "FasolaClasses", result.config.FasolaClasses, result.warnings);
@@ -101,6 +108,21 @@ void NormalizeConfig(Config& config, std::vector<std::string>& warnings) {
 
     if (config.VariancePercent < 0) {
         config.VariancePercent = 0;
+    }
+
+    if (config.MaxExtraFlintPerStack < 0) {
+        warnings.emplace_back("MaxExtraFlintPerStack must not be negative; using 0");
+        config.MaxExtraFlintPerStack = 0;
+    }
+
+    if (config.MaxExtraFlintPerSecond < 0) {
+        warnings.emplace_back("MaxExtraFlintPerSecond must not be negative; using 0");
+        config.MaxExtraFlintPerSecond = 0;
+    }
+
+    if (config.DuplicateDetectionWindowMs < 0) {
+        warnings.emplace_back("DuplicateDetectionWindowMs must not be negative; using 0");
+        config.DuplicateDetectionWindowMs = 0;
     }
 
     if (config.FasolaClasses.empty()) {

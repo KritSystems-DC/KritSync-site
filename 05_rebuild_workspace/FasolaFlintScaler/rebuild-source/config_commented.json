@@ -35,6 +35,27 @@
   // Percentage tolerance around the selected target amount.
   "VariancePercent": 10,
 
+  // Enables anti-dupe guardrails before extra flint is added.
+  "AntiDupeEnabled": true,
+
+  // Writes anti-dupe rejection details when suspicious harvest events are blocked.
+  "LogAntiDupeEvents": true,
+
+  // Maximum extra flint one stack adjustment can add.
+  "MaxExtraFlintPerStack": 700,
+
+  // Maximum extra flint the plugin may add per second.
+  "MaxExtraFlintPerSecond": 2500,
+
+  // Time window used to catch repeated identical events too close together.
+  "DuplicateDetectionWindowMs": 750,
+
+  // Rejects zero, negative, or otherwise invalid extra-flint adjustments.
+  "BlockNegativeOrZeroAdjustments": true,
+
+  // Requires the item owner or inventory to match a configured Fasola class.
+  "RequireFasolaOwnerMatch": true,
+
   // Sends a HUD message when extra flint is added.
   "ShowHudNotificationForExtraFlint": false,
 

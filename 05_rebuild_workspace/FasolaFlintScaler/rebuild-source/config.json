@@ -10,6 +10,13 @@
   "MinTriggerAmount": 1,
   "MaxTriggerAmount": 120,
   "VariancePercent": 10,
+  "AntiDupeEnabled": true,
+  "LogAntiDupeEvents": true,
+  "MaxExtraFlintPerStack": 700,
+  "MaxExtraFlintPerSecond": 2500,
+  "DuplicateDetectionWindowMs": 750,
+  "BlockNegativeOrZeroAdjustments": true,
+  "RequireFasolaOwnerMatch": true,
   "ShowHudNotificationForExtraFlint": false,
   "DebugLogging": false,
   "FasolaClasses": [
