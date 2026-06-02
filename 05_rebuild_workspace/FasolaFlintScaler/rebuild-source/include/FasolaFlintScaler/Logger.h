@@ -19,9 +19,11 @@ public:
     void Debug(const std::string& message);
 
 private:
+    void OpenDebugFileLocked();
     void Write(const char* level, const std::string& message);
 
     std::mutex mutex_;
+    std::filesystem::path plugin_directory_;
     std::ofstream debug_file_;
     bool debug_enabled_ = false;
 };

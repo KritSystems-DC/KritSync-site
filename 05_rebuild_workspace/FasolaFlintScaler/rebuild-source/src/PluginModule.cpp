@@ -9,6 +9,31 @@ std::string BoolText(bool value) {
     return value ? "true" : "false";
 }
 
+bool ContainsClassName(const std::string& value, const std::string& class_name) {
+    return !value.empty() && !class_name.empty() && value.find(class_name) != std::string::npos;
+}
+
+bool IsFlintContext(const FlintContext& context, const Config& config) {
+    return ContainsClassName(context.item_blueprint, config.FlintClass)
+        || ContainsClassName(context.item_archetype_blueprint, config.FlintClass);
+}
+
+bool IsFasolaContext(const FlintContext& context, const Config& config) {
+    for (const auto& class_name : config.FasolaClasses) {
+        if (ContainsClassName(context.owner_blueprint, class_name)
+            || ContainsClassName(context.owner_class_blueprint, class_name)
+            || ContainsClassName(context.inventory_blueprint, class_name)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+std::string EmptyText(const std::string& value) {
+    return value.empty() ? "<empty>" : value;
+}
+
 }  // namespace
 
 void PluginModule::Load() {
@@ -159,21 +184,38 @@ void PluginModule::RegisterHooks() {
     hooks_registered_ = api_.RegisterHarvestHooks([this](const FlintContext& context) {
         if (config_.DebugLogging) {
             std::ostringstream line;
-            line << "FasolaFlintScaler debug: flint detected amount=" << context.amount
-                 << ", inventory_class_bp=" << context.inventory_blueprint
-                 << ", owner_bp=" << context.owner_blueprint
-                 << ", owner_class_bp=" << context.owner_class_blueprint;
+            line << "FasolaFlintScaler debug: harvest event"
+                 << " amount=" << context.amount
+                 << ", trigger_range=" << config_.MinTriggerAmount << "-" << config_.MaxTriggerAmount
+                 << ", target_range=" << config_.TargetFlintMin << "-" << config_.TargetFlintMax
+                 << ", variance_percent=" << config_.VariancePercent
+                 << ", item_class_bp=" << EmptyText(context.item_blueprint)
+                 << ", item_archetype_bp=" << EmptyText(context.item_archetype_blueprint)
+                 << ", inventory_class_bp=" << EmptyText(context.inventory_blueprint)
+                 << ", owner_bp=" << EmptyText(context.owner_blueprint)
+                 << ", owner_class_bp=" << EmptyText(context.owner_class_blueprint)
+                 << ", native_item=" << BoolText(context.native_item != nullptr)
+                 << ", native_inventory=" << BoolText(context.native_inventory != nullptr);
             logger_.Debug(line.str());
         }
 
         const auto decision = scaler_.Evaluate(context);
         if (!decision.applied) {
             if (config_.DebugLogging) {
-                logger_.Debug("FasolaFlintScaler debug: flint inventory rejected. amount="
-                              + std::to_string(context.amount)
-                              + ", inventory_class_bp=" + context.inventory_blueprint
-                              + ", owner_bp=" + context.owner_blueprint
-                              + ", owner_class_bp=" + context.owner_class_blueprint);
+                std::ostringstream line;
+                line << "FasolaFlintScaler debug: harvest event ignored"
+                     << " reason=\"" << decision.reason << "\""
+                     << ", amount=" << context.amount
+                     << ", trigger_match=" << BoolText(context.amount >= config_.MinTriggerAmount
+                                                       && context.amount <= config_.MaxTriggerAmount)
+                     << ", flint_match=" << BoolText(IsFlintContext(context, config_))
+                     << ", fasola_match=" << BoolText(IsFasolaContext(context, config_))
+                     << ", enabled=" << BoolText(config_.Enabled)
+                     << ", license_valid=" << BoolText(license_valid_)
+                     << ", item_class_bp=" << EmptyText(context.item_blueprint)
+                     << ", inventory_class_bp=" << EmptyText(context.inventory_blueprint)
+                     << ", owner_class_bp=" << EmptyText(context.owner_class_blueprint);
+                logger_.Debug(line.str());
             }
             return;
         }
@@ -188,6 +230,21 @@ void PluginModule::RegisterHooks() {
              << " to " << decision.target_amount
              << " (+" << decision.add_amount << ")";
         logger_.Info(line.str());
+
+        if (config_.DebugLogging) {
+            std::ostringstream debug;
+            debug << "FasolaFlintScaler debug: harvest event applied"
+                  << " original_amount=" << decision.original_amount
+                  << ", target_amount=" << decision.target_amount
+                  << ", add_amount=" << decision.add_amount
+                  << ", target_range=" << config_.TargetFlintMin << "-" << config_.TargetFlintMax
+                  << ", variance_percent=" << config_.VariancePercent
+                  << ", item_class_bp=" << EmptyText(context.item_blueprint)
+                  << ", inventory_class_bp=" << EmptyText(context.inventory_blueprint)
+                  << ", owner_class_bp=" << EmptyText(context.owner_class_blueprint)
+                  << ", native_add_path=" << BoolText(context.native_item != nullptr);
+            logger_.Debug(debug.str());
+        }
     });
 }
 

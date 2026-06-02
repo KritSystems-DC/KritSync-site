@@ -9,16 +9,23 @@ namespace FasolaFlintScaler {
 
 void Logger::Open(const std::filesystem::path& plugin_directory, bool debug_enabled) {
     std::lock_guard lock(mutex_);
+    plugin_directory_ = plugin_directory;
     debug_enabled_ = debug_enabled;
 
-    if (debug_enabled_) {
-        debug_file_.open(plugin_directory / "FasolaFlintScaler.debug.log", std::ios::app);
-    }
+    OpenDebugFileLocked();
 }
 
 void Logger::SetDebugEnabled(bool enabled) {
     std::lock_guard lock(mutex_);
     debug_enabled_ = enabled;
+
+    if (!debug_enabled_ && debug_file_.is_open()) {
+        debug_file_.flush();
+        debug_file_.close();
+        return;
+    }
+
+    OpenDebugFileLocked();
 }
 
 void Logger::Close() {
@@ -45,6 +52,14 @@ void Logger::Debug(const std::string& message) {
     if (debug_enabled_) {
         Write("debug", message);
     }
+}
+
+void Logger::OpenDebugFileLocked() {
+    if (!debug_enabled_ || debug_file_.is_open() || plugin_directory_.empty()) {
+        return;
+    }
+
+    debug_file_.open(plugin_directory_ / "FasolaFlintScaler.debug.log", std::ios::app);
 }
 
 void Logger::Write(const char* level, const std::string& message) {

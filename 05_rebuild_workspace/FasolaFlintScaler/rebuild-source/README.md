@@ -163,4 +163,4 @@ $env:ASA_API_LIB_ROOT = "C:\Users\Administrator\Downloads\AsaApi_1.19"
 - If CMake cannot find ASA API, verify `ASA_API_ROOT`.
 - If the plugin loads but does not apply behavior, check `LicenseKey`, `Enabled`, and the Fasola/flint blueprint class names.
 - If harvest values look wrong, verify `HarvestAmountMultiplier` in `GameUserSettings.ini` or set `ReadHarvestAmountMultiplierFromIni` to `false`.
-- Enable `DebugLogging` only while diagnosing server behavior.
+- Enable `DebugLogging` only while diagnosing server behavior. Debug logs show each harvest event amount, item class, inventory class, owner class, trigger range, target range, rejection reason, and extra flint amount added.
