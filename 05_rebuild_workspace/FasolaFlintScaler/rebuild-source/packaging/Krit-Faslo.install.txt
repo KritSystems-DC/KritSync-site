@@ -1,0 +1,17 @@
+Install folder:
+
+ShooterGame/Binaries/Win64/ArkApi/Plugins/Krit-Faslo/
+
+Release contents:
+
+Krit-Faslo/
+  Krit-Faslo.dll
+  config.json
+
+Optional documentation files:
+
+Krit-Faslo/
+  CONFIG-COMMENTED.jsonc
+  README.md
+
+Do not place private license signing material on the game server.

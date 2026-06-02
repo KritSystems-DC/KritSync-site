@@ -1,0 +1,8 @@
+#pragma once
+
+#define FASOLA_PRODUCT_NAME "Krit-Faslo"
+#define FASOLA_INTERNAL_NAME "FasolaFlintScaler"
+#define FASOLA_VERSION_MAJOR 1
+#define FASOLA_VERSION_MINOR 0
+#define FASOLA_VERSION_PATCH 0
+#define FASOLA_VERSION_STRING "1.0.0"
